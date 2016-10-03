@@ -1,0 +1,18 @@
+{
+  "title": "Telegram Bot",
+  "copyright": "Casper Broeren 2016",
+  "description": "Implementation of Telegram Bot",
+  "version": "1.0.0-*",
+
+  "dependencies": {
+    "NETStandard.Library": "1.6.0",
+    "System.Net.Http": "4.1.0.0",
+    "System.Net.Requests": "4.0.11"
+  },
+
+  "frameworks": {
+    "netstandard1.6": {
+      "imports": "dnxcore50"
+    }
+  }
+}
