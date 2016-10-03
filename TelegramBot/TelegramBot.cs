@@ -49,6 +49,8 @@ namespace TelegramBot
         private T DoRequest<T>(string action) where T : new()
         {
             // TODO
+            var webRequest = WebRequest.CreateRequest(ApiURL+"/"+action);
+
             return new T();
         }
     }
