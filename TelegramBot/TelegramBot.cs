@@ -1,19 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using TelegramBot.ResponseObjects;
+using System.Net.Http;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace TelegramBot
 {
+    public delegate void  UpdateReceived();
     /// <summary>
     /// Nicked from https://github.com/kolar/telegram-poll-bot/blob/master/TelegramBot.php
     /// Should relate to https://core.telegram.org/bots/api
     /// </summary>
     public class TelegramBot
     {
-
+        public UpdateReceived OnUpdateReceived { get; set; }
 
         public string Token { get; set; }
         public bool Inited { get; private set; }
@@ -31,11 +32,11 @@ namespace TelegramBot
         }
 
 
-        public bool Init()
+        public async Task<bool> Init()
         {
             if (Inited) return true;
 
-            var response = DoRequest<GetMeResponse>("getMe");
+            var response = await DoRequest<GetMeResponse>("getMe", null);
             if (!response.Ok)
                 throw new Exception("Can't connect to server");
 
@@ -46,12 +47,82 @@ namespace TelegramBot
             return true;
         }
 
-        private T DoRequest<T>(string action) where T : new()
+        public async Task RunLongPoll()
+        {
+            await Init();
+            await LongPoll();
+        }
+
+        public async Task<bool> SetWebHook(string url)
+        {
+            await Init();  
+            var result = await DoRequest<WebHookResponse>("setWebhook",new {
+                    Method = "POST", 
+                    URL = url
+            } ); 
+            return result.Ok;
+        }
+
+        public async Task<bool> RemoveWebHook()
+        {
+            await Init();  
+            var result = await DoRequest<WebHookResponse>("setWebhook",new { 
+                    Method = "POST",
+                    URL = ""
+            } ); 
+            return result.Ok;
+        }
+        
+        private async Task LongPoll()
+        {
+            await Init(); 
+             var result = await DoRequest<WebHookResponse>("getUpdates",new { 
+                    Method = "POST",
+                    URL = ""
+            } );  
+        }
+
+
+
+        private async Task<T> DoRequest<T>(string action, dynamic options) where T : new()
         {
             // TODO
-            var webRequest = WebRequest.CreateRequest(ApiURL+"/"+action);
+            using (var client = new HttpClient())
+            {
+                try {
+                    var request = new HttpRequestMessage(HttpMethod.Get, action);
+                    request.Headers.ExpectContinue = false;
+                    
+                    client.BaseAddress = new System.Uri($"{ApiURL}"); 
+                    if (options.Method == "POST")
+                    {
+                        request.Method = HttpMethod.Post;
+                        var values = new List<KeyValuePair<string, string>>();
+                        if (options.URL !=null) values.Add(new KeyValuePair<string, string>("url", options.URL));
+                            
+                        request.Content = new FormUrlEncodedContent(values);
 
-            return new T();
+                    }
+                     
+                    var response = await client.SendAsync(request); 
+                    response.EnsureSuccessStatusCode();
+
+                    var result = await response.Content.ReadAsStringAsync();
+                    T returnObject = default(T);
+                    await Task.Factory.StartNew ( () => {
+                        returnObject =  JsonConvert.DeserializeObject<T>(result);
+                    });
+            
+                    return returnObject;
+                }
+                catch(Exception exc)
+                {
+                    // TODO
+
+                    return default(T);
+                }
+            } 
+          
         }
     }
 }
