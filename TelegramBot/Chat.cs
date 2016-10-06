@@ -1,18 +1,32 @@
+
+using System.Runtime.Serialization;
+
 namespace TelegramBot
 {
+    [DataContract]
     public class Chat    {
-        public int id { get; set;}
+        
+       [DataMember(Name="id")]
+       
+        public int ID { get; set;}
+       [DataMember(Name="type")]
 
-        public string type { get; set; }
-        public string title { get; set; }
+        public string Type { get; set; }
 
-        public string username { get; set; }
+       [DataMember(Name="title")]
+        public string Title { get; set; }
 
-        public string first_name { get; set; }
+       [DataMember(Name="username")]
+        public string Username { get; set; }
 
-        public string last_name { get; set; }
+       [DataMember(Name="first_name")]
+        public string FirstName { get; set; }
 
-        public bool all_members_are_administrators { get; set; }
+       [DataMember(Name="last_name")]
+        public string LastName { get; set; }
+
+       [DataMember(Name="all_members_are_administrators")]
+        public bool AllMembersAreAdministrators { get; set; }
 
     }
 }

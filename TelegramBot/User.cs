@@ -1,15 +1,21 @@
+using System.Runtime.Serialization;
 
 
 namespace TelegramBot
 {
+    [DataContract]
     public class User    {
-        public int id { get; set;}
+        [DataMember(Name="id")]
+        public int ID { get; set;}
 
-        public string  first_name { get; set; }
+        [DataMember(Name="first_name")]
+        public string  FirstName { get; set; }
 
-        public string last_name { get; set; }
+        [DataMember(Name="last_name")]
+        public string LastName { get; set; }
 
-        public string username { get; set; }
+        [DataMember(Name="username")]
+        public string Username { get; set; }
         
     }
 }
