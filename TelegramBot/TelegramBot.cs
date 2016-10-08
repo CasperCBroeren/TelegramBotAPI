@@ -23,12 +23,13 @@ namespace TelegramBot
         public int BotId { get; set; }
         public string BotUsername { get; set; }
 
-        public TelegramBot(string token, TelegramBotOptions options)
+        public TelegramBot(string token, TelegramBotOptions options = null)
         {
+            if (options == null) options = new TelegramBotOptions();
             Token = token;
             string protoPart = (options.Port == 443)? "https": "http";
-            string portPart = (options.Port == 433 || options.Port == 80) ? "" : ":" + options.Port;
-            ApiURL = $"{protoPart}://{options.Host}{portPart}/bot/{Token}";
+            string portPart = (options.Port == 443 || options.Port == 80) ? "" : ":" + options.Port;
+            ApiURL = $"{protoPart}://{options.Host}{portPart}/bot{Token}";
         }
 
 
@@ -90,11 +91,11 @@ namespace TelegramBot
             using (var client = new HttpClient())
             {
                 try {
-                    var request = new HttpRequestMessage(HttpMethod.Get, action);
+                    var uri = new System.Uri($"{ApiURL}/{action}");
+                    var request = new HttpRequestMessage(HttpMethod.Get, uri);
                     request.Headers.ExpectContinue = false;
-                    
-                    client.BaseAddress = new System.Uri($"{ApiURL}"); 
-                    if (options.Method == "POST")
+                     
+                    if (options != null && options.Method == "POST")
                     {
                         request.Method = HttpMethod.Post;
                         var values = new List<KeyValuePair<string, string>>();
@@ -105,7 +106,6 @@ namespace TelegramBot
                     }
                      
                     var response = await client.SendAsync(request); 
-                    response.EnsureSuccessStatusCode();
 
                     var result = await response.Content.ReadAsStringAsync();
                     T returnObject = default(T);

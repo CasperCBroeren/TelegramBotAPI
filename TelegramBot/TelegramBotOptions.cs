@@ -7,8 +7,8 @@ namespace TelegramBot
 {
     public sealed class TelegramBotOptions
     {
-        public string Host { get; set; } = "http://api.telegram.org";
+        public string Host { get; set; } = "api.telegram.org";
 
-        public int Port { get; set; } = 433;
+        public int Port { get; set; } = 443;
     }
 }

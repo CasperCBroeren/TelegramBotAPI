@@ -1,12 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+ using System.Runtime.Serialization;
+
 
 namespace TelegramBot.ResponseObjects
 {
-    public class WebHookResponse
+    [DataContract]
+    public class WebHookResponse: BaseResponse
     {
-        public bool Ok { get; set; } 
+      
     }
 }
