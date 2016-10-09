@@ -40,8 +40,9 @@ namespace TelegramBot
 
         [DataMember(Name="document")]
         public Document Document {get;set;}
-
-        //TODO game
+        
+        [DataMember(Name="game")]
+        public Game Game {get; set;}
         
         [DataMember(Name="photo")]
         public PhotoSize[] Photos { get; set; }
@@ -72,5 +73,36 @@ namespace TelegramBot
 
         [DataMember(Name="left_chat_member")]
         public User LeftChatMember { get; set; }
+
+        [DataMember(Name="new_chat_title")]
+        public string NewChatTitle { get; set; }
+
+        [DataMember(Name="new_chat_photo")]
+        public PhotoSize[] NewChatPhoto { get; set; }
+
+        [DataMember(Name="delete_chat_photo")]
+        public bool DeleteChatPhoto { get; set; }
+
+        [DataMember(Name="group_chat_created")]
+        public bool GroupChatCreated {get;set;}
+
+
+        [DataMember(Name="supergroup_chat_created")]
+        public bool SuperGroupChatCreated {get;set;}
+
+
+        [DataMember(Name="channel_chat_created")]
+        public bool ChannelChatCreated {get;set;}
+
+        [DataMember(Name="migrate_to_chat_id")]
+        public int MigrateToChatID { get; set; }
+
+
+        [DataMember(Name="migrate_from_chat_id")]
+        public int MigrateFromChatID { get; set; }
+        
+        [DataMember(Name="pinned_message")]
+        public Message PinnedMessage { get; set; }
+        
     }
 }
