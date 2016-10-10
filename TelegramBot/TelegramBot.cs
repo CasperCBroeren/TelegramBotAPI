@@ -4,16 +4,21 @@ using TelegramBot.ResponseObjects;
 using System.Net.Http;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace TelegramBot
 {
-    public delegate void  UpdateReceived();
+    public delegate void UpdateReceived(Update update);
     /// <summary>
     /// Nicked from https://github.com/kolar/telegram-poll-bot/blob/master/TelegramBot.php
     /// Should relate to https://core.telegram.org/bots/api
     /// </summary>
     public class TelegramBot
     {
+        public int UpdatesLimit { get; set; } = 30;
+        public int UpdatesTimeout { get; set; } = 10;
+        public int? UpdatesOffset { get; set; } = null;
+        public int NetConnectionTimeout { get; set; }
         public UpdateReceived OnUpdateReceived { get; set; }
 
         public string Token { get; set; }
@@ -27,7 +32,7 @@ namespace TelegramBot
         {
             if (options == null) options = new TelegramBotOptions();
             Token = token;
-            string protoPart = (options.Port == 443)? "https": "http";
+            string protoPart = (options.Port == 443) ? "https" : "http";
             string portPart = (options.Port == 443 || options.Port == 80) ? "" : ":" + options.Port;
             ApiURL = $"{protoPart}://{options.Host}{portPart}/bot{Token}";
         }
@@ -48,81 +53,114 @@ namespace TelegramBot
             return true;
         }
 
-        public async Task RunLongPoll()
+        public async Task RunLongPoll(UpdateReceived onUpdateReceived)
         {
             await Init();
-            await LongPoll();
+            await LongPoll(onUpdateReceived);
         }
 
         public async Task<bool> SetWebHook(string url)
         {
-            await Init();  
-            var result = await DoRequest<WebHookResponse>("setWebhook",new {
-                    Method = "POST", 
-                    URL = url
-            } ); 
+            await Init();
+            var result = await DoRequest<WebHookResponse>("setWebhook", new
+            {
+                Method = "POST",
+                URL = url
+            });
             return result.Ok;
         }
 
         public async Task<bool> RemoveWebHook()
         {
-            await Init();  
-            var result = await DoRequest<WebHookResponse>("setWebhook",new { 
-                    Method = "POST",
-                    URL = ""
-            } ); 
+            await Init();
+            var result = await DoRequest<WebHookResponse>("setWebhook", new
+            {
+                Method = "POST",
+                URL = ""
+            });
             return result.Ok;
         }
-        
-        private async Task LongPoll()
+
+        private async Task LongPoll(UpdateReceived onUpdateReceived)
         {
-            await Init(); 
-             var result = await DoRequest<WebHookResponse>("getUpdates",new { 
-                    Method = "POST",
-                    URL = ""
-            } );  
+
+            var result = await DoRequest<UpdateResponse>("getUpdates", new
+            {
+                Method = "POST",
+                Limit = UpdatesLimit,
+                Timeout = UpdatesTimeout,
+                Offset = UpdatesOffset
+            });
+            if (result.Ok)
+            {
+                if (result.Result != null)
+                {
+                    foreach (var update in result.Result)
+                    {
+                        UpdatesOffset = update.UpdateID + 1;
+                        if (onUpdateReceived != null)
+                            onUpdateReceived.Invoke(update);
+                    }
+                }
+
+            }
+           await LongPoll(onUpdateReceived);
         }
 
 
 
         private async Task<T> DoRequest<T>(string action, dynamic options) where T : new()
         {
-            // TODO
+
             using (var client = new HttpClient())
             {
-                try {
+                try
+                {
                     var uri = new System.Uri($"{ApiURL}/{action}");
                     var request = new HttpRequestMessage(HttpMethod.Get, uri);
                     request.Headers.ExpectContinue = false;
-                     
+
                     if (options != null && options.Method == "POST")
                     {
+                        request.Headers.Add("ContentType", "application/x-www-form-urlencoded");
                         request.Method = HttpMethod.Post;
                         var values = new List<KeyValuePair<string, string>>();
-                        if (options.URL !=null) values.Add(new KeyValuePair<string, string>("url", options.URL));
-                            
+                        if (IsPropertyExist(options, "URL")) values.Add(new KeyValuePair<string, string>("url", options.URL));
+                        if (IsPropertyExist(options, "Limit")) values.Add(new KeyValuePair<string, string>("limit", options.Limit.ToString()));
+                        if (IsPropertyExist(options, "Timeout")) values.Add(new KeyValuePair<string, string>("timeout", options.Timeout.ToString()));
+                        if (IsPropertyExist(options, "Offset") && options.Offset != null) values.Add(new KeyValuePair<string, string>("offset", options.Offset.ToString()));
+                        if (action == "getUpdates")
+                        {
+                            client.Timeout = TimeSpan.FromSeconds(NetConnectionTimeout + options.Limit + 2);
+                        }
+
                         request.Content = new FormUrlEncodedContent(values);
 
                     }
-                     
-                    var response = await client.SendAsync(request); 
+
+                    var response = await client.SendAsync(request);
 
                     var result = await response.Content.ReadAsStringAsync();
                     T returnObject = default(T);
-                    await Task.Factory.StartNew ( () => {
-                        returnObject =  JsonConvert.DeserializeObject<T>(result);
+                    await Task.Factory.StartNew(() =>
+                    {
+                        returnObject = JsonConvert.DeserializeObject<T>(result);
                     });
-            
+
                     return returnObject;
                 }
-                catch(Exception exc)
+                catch (Exception exc)
                 {
                     // TODO
 
                     return default(T);
                 }
-            } 
-          
+            }
+
+        }
+        public static bool IsPropertyExist(dynamic item, string name)
+        {
+            return item.GetType().GetProperty(name) != null;
         }
     }
 }
