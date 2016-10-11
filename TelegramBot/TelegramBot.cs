@@ -5,13 +5,15 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Threading;
+using System.IO;
+using System.Text;
 
 namespace TelegramBot
 {
     public delegate void UpdateReceived(Update update);
     /// <summary>
-    /// Nicked from https://github.com/kolar/telegram-poll-bot/blob/master/TelegramBot.php
-    /// Should relate to https://core.telegram.org/bots/api
+    /// Inspiration from https://github.com/kolar/telegram-poll-bot/blob/master/TelegramBot.php
+    /// Confirms to https://core.telegram.org/bots/api
     /// </summary>
     public class TelegramBot
     {
@@ -38,7 +40,7 @@ namespace TelegramBot
         }
 
 
-        public async Task<bool> Init()
+        public async Task<bool> InitAsync()
         {
             if (Inited) return true;
 
@@ -53,15 +55,27 @@ namespace TelegramBot
             return true;
         }
 
-        public async Task RunLongPoll(UpdateReceived onUpdateReceived)
+        public async Task<MessageResponse> SendMessageAsync(MessageToSend message)
         {
-            await Init();
+            await InitAsync();
+            var result = await DoRequest<MessageResponse>("sendMessage", new
+            {
+                Method = "JSON",
+                Payload = message
+            });
+
+            return result;
+        }
+
+        public async Task RunLongPollAsync(UpdateReceived onUpdateReceived)
+        {
+            await InitAsync();
             await LongPoll(onUpdateReceived);
         }
 
-        public async Task<bool> SetWebHook(string url)
+        public async Task<bool> SetWebHookAsync(string url)
         {
-            await Init();
+            await InitAsync();
             var result = await DoRequest<WebHookResponse>("setWebhook", new
             {
                 Method = "POST",
@@ -70,9 +84,9 @@ namespace TelegramBot
             return result.Ok;
         }
 
-        public async Task<bool> RemoveWebHook()
+        public async Task<bool> RemoveWebHookAsync()
         {
-            await Init();
+            await InitAsync();
             var result = await DoRequest<WebHookResponse>("setWebhook", new
             {
                 Method = "POST",
@@ -104,7 +118,7 @@ namespace TelegramBot
                 }
 
             }
-           await LongPoll(onUpdateReceived);
+            await LongPoll(onUpdateReceived);
         }
 
 
@@ -117,8 +131,7 @@ namespace TelegramBot
                 try
                 {
                     var uri = new System.Uri($"{ApiURL}/{action}");
-                    var request = new HttpRequestMessage(HttpMethod.Get, uri);
-                    request.Headers.ExpectContinue = false;
+                    var request = new HttpRequestMessage(HttpMethod.Get, uri); 
 
                     if (options != null && options.Method == "POST")
                     {
@@ -136,6 +149,20 @@ namespace TelegramBot
 
                         request.Content = new FormUrlEncodedContent(values);
 
+                    }
+                    if (options != null && options.Method == "JSON")
+                    {
+
+                     
+                        request.Method = HttpMethod.Post;
+                        if (IsPropertyExist(options, "Payload"))
+                        {
+                            string serialized = await JsonConvert.SerializeObjectAsync(options.Payload, Formatting.None, new JsonSerializerSettings()
+                            {
+                                NullValueHandling = NullValueHandling.Ignore
+                            });
+                            request.Content = new StringContent(serialized, Encoding.UTF8, "application/json"); 
+                        }
                     }
 
                     var response = await client.SendAsync(request);

@@ -18,7 +18,7 @@ namespace TelegramBot.Test
         public async Task Test_Init()
         {
             var bot = new TelegramBot(TelegramToken);
-            bool initOk = await bot.Init();
+            bool initOk = await bot.InitAsync();
             Assert.Equal(true, initOk);
         }
 
@@ -26,7 +26,7 @@ namespace TelegramBot.Test
         public async Task Test_WebhookSet()
         {
             var bot = new TelegramBot(TelegramToken);
-            var result = await bot.SetWebHook("https://github.com/kolar/telegram-poll-bot/blob/master/TelegramBot.php");
+            var result = await bot.SetWebHookAsync("https://github.com/kolar/telegram-poll-bot/blob/master/TelegramBot.php");
             Assert.Equal(true, result);
         }
 
@@ -34,7 +34,7 @@ namespace TelegramBot.Test
         public async Task Test_WebhookRemove()
         {
             var bot = new TelegramBot(TelegramToken);
-            var result = await bot.RemoveWebHook();
+            var result = await bot.RemoveWebHookAsync();
             Assert.Equal(true, result);
         }
 
@@ -42,7 +42,7 @@ namespace TelegramBot.Test
         public async Task Test_Longpolling()
         {
             var bot = new TelegramBot(TelegramToken);
-            await bot.RunLongPoll(MessageReceived);
+            await bot.RunLongPollAsync(MessageReceived);
 
             // Assert.Equal(true, result);
         }
@@ -50,11 +50,26 @@ namespace TelegramBot.Test
         public void MessageReceived(Update u)
         {
             output.WriteLine("Message: {0}", u.Message.Text);
+            var bot = new TelegramBot(TelegramToken);
+            var result =   bot.SendMessageAsync(new MessageToSend()
+            {
+                ChatID = u.Message.From.ID.ToString(),
+                Text = "Mauuuuw....<b>MAH</b>",
+                ParseMode = "HTML"
+            });
+            result.Wait();
         }
-
+        [Fact]
         public async Task SendToUser()
         {
-            var userID = "x";
+            var userID = "264162278";
+            var bot = new TelegramBot(TelegramToken);
+            var result = await bot.SendMessageAsync(new MessageToSend() {
+                ChatID = userID,
+                Text = "Mauuuuw....<b>MAH</b>", 
+                 ParseMode = "HTML"
+            });
+            Assert.True(result.Ok);
         }
     }
 }
