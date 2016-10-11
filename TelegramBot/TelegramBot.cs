@@ -39,6 +39,7 @@ namespace TelegramBot
             ApiURL = $"{protoPart}://{options.Host}{portPart}/bot{Token}";
         }
 
+      
 
         public async Task<bool> InitAsync()
         {
@@ -67,10 +68,10 @@ namespace TelegramBot
             return result;
         }
 
-        public async Task RunLongPollAsync(UpdateReceived onUpdateReceived)
+        public async Task RunLongPollAsync(UpdateReceived onUpdateReceived, CancellationToken token)
         {
             await InitAsync();
-            await LongPoll(onUpdateReceived);
+            await LongPoll(onUpdateReceived, token);
         }
 
         public async Task<bool> SetWebHookAsync(string url)
@@ -95,16 +96,18 @@ namespace TelegramBot
             return result.Ok;
         }
 
-        private async Task LongPoll(UpdateReceived onUpdateReceived)
+        private async Task LongPoll(UpdateReceived onUpdateReceived, CancellationToken cancelToken)
         {
 
-            var result = await DoRequest<UpdateResponse>("getUpdates", new
+            var getUpdateTask = Task.Run(()=> DoRequest<UpdateResponse>("getUpdates", new
             {
                 Method = "POST",
                 Limit = UpdatesLimit,
                 Timeout = UpdatesTimeout,
                 Offset = UpdatesOffset
-            });
+            }), cancelToken);
+            var result = await getUpdateTask;
+
             if (result.Ok)
             {
                 if (result.Result != null)
@@ -118,7 +121,8 @@ namespace TelegramBot
                 }
 
             }
-            await LongPoll(onUpdateReceived);
+           
+            await LongPoll(onUpdateReceived, cancelToken);
         }
 
 

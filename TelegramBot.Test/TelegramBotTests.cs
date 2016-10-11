@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -6,6 +8,7 @@ namespace TelegramBot.Test
 {
     public class Base
     {
+        CancellationTokenSource source = new CancellationTokenSource();
         private const string TelegramToken = "x";
         private readonly ITestOutputHelper output;
 
@@ -41,10 +44,13 @@ namespace TelegramBot.Test
         [Fact]
         public async Task Test_Longpolling()
         {
-            var bot = new TelegramBot(TelegramToken);
-            await bot.RunLongPollAsync(MessageReceived);
+           
+        
 
-            // Assert.Equal(true, result);
+            var bot = new TelegramBot(TelegramToken);
+            await bot.RunLongPollAsync(MessageReceived, source.Token);
+
+            Assert.True(true);
         }
 
         public void MessageReceived(Update u)
