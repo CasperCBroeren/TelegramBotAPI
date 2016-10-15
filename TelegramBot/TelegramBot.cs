@@ -106,6 +106,21 @@ namespace TelegramBot
             return result;
         }
         /// <summary>
+        /// Use this method to send photos. On success, the sent Message is returned.
+        /// </summary>
+        public async Task<MessageResponse> SendPhotoAsync(PhotoToSend photo)
+        {
+            await InitAsync();
+            var result = await DoRequest<MessageResponse>("SendPhoto", new 
+            {
+                Method = "JSON",
+                Payload = photo
+            });
+
+            return result;
+        }
+
+        /// <summary>
         /// Executes the longpolling and gives updates through the supplied delegate UpdateReceived
         /// </summary>
         public async Task RunLongPollAsync(UpdateReceived onUpdateReceived, CancellationToken token)
@@ -140,6 +155,17 @@ namespace TelegramBot
             });
             return result.Ok;
         }
+
+        /// <summary>
+        /// Use this method to get current webhook status. Requires no parameters. On success, returns a WebhookInfo object. If the bot is using getUpdates, will return an object with the url field empty.
+        /// </summary>
+        public async Task<WebHookInfoResponse> GetWebhookInfoAsync()
+        {
+            await InitAsync();
+            var result = await DoRequest<WebHookInfoResponse>("getWebhookInfo", new { Method="GET"});
+            return result;
+        }
+
         /// <summary>
         /// Internal Longpoll method which can be call recursively
         /// </summary>
