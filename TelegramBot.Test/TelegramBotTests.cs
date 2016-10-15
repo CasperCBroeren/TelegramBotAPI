@@ -44,8 +44,8 @@ namespace TelegramBot.Test
         [Fact]
         public async Task Test_Longpolling()
         {
-           
-        
+
+
 
             var bot = new TelegramBot(TelegramToken);
             await bot.RunLongPollAsync(MessageReceived, source.Token);
@@ -57,12 +57,46 @@ namespace TelegramBot.Test
         {
             output.WriteLine("Message: {0}", u.Message.Text);
             var bot = new TelegramBot(TelegramToken);
-            var result =   bot.SendMessageAsync(new MessageToSend()
+            var random = new Random(System.Environment.TickCount);
+            int option = random.Next(0, 3);
+            Task result = null;
+            if (option == 0)
             {
-                ChatID = u.Message.From.ID.ToString(),
-                Text = "Mauuuuw....<b>MAH</b>",
-                ParseMode = "HTML"
-            });
+                result = bot.SendMessageAsync(new MessageToSend()
+                {
+                    ChatID = u.Message.From.ID.ToString(),
+                    Text = "Mauuuuw....<b>MAH</b>",
+                    ParseMode = "HTML"
+                });
+            }
+            if (option == 1)
+            {
+                var name = u.Message.From.FirstName != null ? u.Message.From.FirstName : u.Message.From.Username;
+                result = bot.SendMessageAsync(new MessageToSend()
+                {
+                    ChatID = u.Message.From.ID.ToString(),
+                    Text = $"<i>PRRRRRrrrrr...{name}</i>",
+                    ParseMode = "HTML"
+                });
+            }
+            if (option == 2)
+            {
+                result = bot.SendMessageAsync(new MessageToSend()
+                {
+                    ChatID = u.Message.From.ID.ToString(),
+                    Text = $"Mauw mauw mauw mauw, Mauw mauw mauw mauw,Mauw mauw mauw mauw,Mauw mauw mauw mauw",
+                    ParseMode = "HTML"
+                });
+            }
+            if (option == 3)
+            {
+                result = bot.SendMessageAsync(new MessageToSend()
+                {
+                    ChatID = u.Message.From.ID.ToString(),
+                    Text = $"zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
+                    ParseMode = "HTML"
+                });
+            }
             result.Wait();
         }
         [Fact]
@@ -72,8 +106,22 @@ namespace TelegramBot.Test
             var bot = new TelegramBot(TelegramToken);
             var result = await bot.SendMessageAsync(new MessageToSend() {
                 ChatID = userID,
-                Text = "Mauuuuw....<b>MAH</b>", 
-                 ParseMode = "HTML"
+                Text = "Mauuuuw....<b>MAH</b>",
+                ParseMode = "HTML"
+            });
+            Assert.True(result.Ok);
+        }
+        [Fact]
+        public async Task SendPicture()
+        {
+            string img = "https://blackcatsrule.files.wordpress.com/2014/10/cute-black-cat-detts6f6.jpg";
+            var userID = "264162278";
+            var bot = new TelegramBot(TelegramToken);
+            var result = await bot.SendPhotoAsync(new PhotoToSend()
+            {
+                ChatID = userID,
+                Photo = img,
+                Caption = "Fake"
             });
             Assert.True(result.Ok);
         }

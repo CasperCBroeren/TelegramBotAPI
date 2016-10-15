@@ -3,18 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A87D1EC0-C507-4FCE-9E16-D235571027EF}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3F9E4E2C-D07B-459F-94E8-369350EDD5C1}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "PomBot", "src\PomBot\PomBot.xproj", "{6CDD7E41-2803-4B90-A04A-5E65C85D33FA}"
-EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "TelegramBot", "TelegramBot\TelegramBot.xproj", "{7E5E5086-8AB2-4575-8CA6-E605D4D6CF62}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "TelegramBot.Test", "TelegramBot.Test\TelegramBot.Test.xproj", "{88F93146-0045-4CF8-9A22-878C92B47E3B}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "PomBot", "PomBot\PomBot.xproj", "{9025921D-E247-49D1-A83A-0D015315EAE5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,10 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6CDD7E41-2803-4B90-A04A-5E65C85D33FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6CDD7E41-2803-4B90-A04A-5E65C85D33FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6CDD7E41-2803-4B90-A04A-5E65C85D33FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6CDD7E41-2803-4B90-A04A-5E65C85D33FA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7E5E5086-8AB2-4575-8CA6-E605D4D6CF62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7E5E5086-8AB2-4575-8CA6-E605D4D6CF62}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E5E5086-8AB2-4575-8CA6-E605D4D6CF62}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -34,13 +23,12 @@ Global
 		{88F93146-0045-4CF8-9A22-878C92B47E3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88F93146-0045-4CF8-9A22-878C92B47E3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88F93146-0045-4CF8-9A22-878C92B47E3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9025921D-E247-49D1-A83A-0D015315EAE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9025921D-E247-49D1-A83A-0D015315EAE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9025921D-E247-49D1-A83A-0D015315EAE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9025921D-E247-49D1-A83A-0D015315EAE5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{6CDD7E41-2803-4B90-A04A-5E65C85D33FA} = {A87D1EC0-C507-4FCE-9E16-D235571027EF}
-		{7E5E5086-8AB2-4575-8CA6-E605D4D6CF62} = {A87D1EC0-C507-4FCE-9E16-D235571027EF}
-		{88F93146-0045-4CF8-9A22-878C92B47E3B} = {A87D1EC0-C507-4FCE-9E16-D235571027EF}
 	EndGlobalSection
 EndGlobal
