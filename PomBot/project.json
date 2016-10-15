@@ -16,5 +16,6 @@
     "netcoreapp1.0": {
       "imports": "dnxcore50"
     }
-  }
+  },
+  "userSecretsId": "aspnet-PomBot-20161015050349"
 }
