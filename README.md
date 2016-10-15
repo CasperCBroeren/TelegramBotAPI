@@ -7,5 +7,5 @@ The core code for TelegramBot which allows you to use the Telegram API
 TelegramBot.Test
 The xunit test project validating the TelegramBot code
 
-src/PomBot
+PomBot
 The demo project featuring my cat
