@@ -1,14 +1,18 @@
 {
-  "title": "Telegram Bot",
+  "title": "Unofficial Telegram Bot API",
+  "authors": [ "CasperCBroeren" ],
   "copyright": "Casper Broeren 2016",
-  "description": "Implementation of Telegram Bot",
-  "version": "1.0.0-*",
-
+  "description": "Implementation of Telegram Bot API not by Telegram",
+  "releaseNotes": "Pre release version. Not all API methods are implemented. Just the basic like long poll and send message and photo",
+  "version": "0.1.1-*",
+  "projectUrl": "https://github.com/CasperCBroeren/TelegramBotAPI",
+  "iconUrl": "https://github.com/CasperCBroeren/TelegramBotAPI/raw/master/t_logo.png",
+  "tags": ["Telegram", "Bot", "Telegram Bot API"],
   "dependencies": {
     "NETStandard.Library": "1.6.0",
     "System.Net.Http": "4.1.0.0",
     "System.Net.Requests": "4.0.11",
-    "Newtonsoft.Json":"9.0.1",
+    "Newtonsoft.Json": "9.0.1",
     "System.Runtime.Serialization.Json": "4.0.2"
   },
 
@@ -18,6 +22,6 @@
     }
   },
   "scripts": {
-    "postcompile": ["dotnet pack --no-build --configuration %compile:Configuration%"]
+    "postcompile": [ "dotnet pack --no-build --configuration %compile:Configuration%" ]
   }
 }
