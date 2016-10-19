@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
-namespace TelegramBot
+namespace TelegramBot.RequestObjects
 {
     [DataContract]
     public class MessageToSend

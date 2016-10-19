@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.IO;
 using System.Text;
+using TelegramBot.RequestObjects;
 
 namespace TelegramBot
 {
@@ -111,10 +112,38 @@ namespace TelegramBot
         public async Task<MessageResponse> SendPhotoAsync(PhotoToSend photo)
         {
             await InitAsync();
-            var result = await DoRequest<MessageResponse>("SendPhoto", new 
+            var result = await DoRequest<MessageResponse>("sendPhoto", new 
             {
                 Method = "JSON",
                 Payload = photo
+            });
+
+            return result;
+        }
+        /// <summary>
+        /// Use this method to send audio. On success, the sent Message is returned.
+        /// </summary>
+        public async Task<MessageResponse> SendAudioAsync(AudioToSend audio)
+        {
+            await InitAsync();
+            var result = await DoRequest<MessageResponse>("sendAudio", new 
+            {
+                Method = "JSON",
+                Payload = audio
+            });
+
+            return result;
+        }
+        /// <summary>
+        /// Use this method to send a document. On success, the sent Message is returned.
+        /// </summary>
+        public async Task<MessageResponse> SendDocumentAsync(DocumentToSend document)
+        {
+            await InitAsync();
+            var result = await DoRequest<MessageResponse>("sendDocument", new 
+            {
+                Method = "JSON",
+                Payload = document
             });
 
             return result;

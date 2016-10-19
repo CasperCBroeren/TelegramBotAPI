@@ -1,16 +1,16 @@
  using System.Runtime.Serialization;
 
 
-namespace TelegramBot
+namespace TelegramBot.RequestObjects
 {
 
 
     /// <summary>
-    /// The photo and caption to send.
-    /// For now only url's of the photo must be used to send the image to Telegram
+    /// The audio and caption to send.
+    /// For now only url's of the audio can be send
     /// </summary>
     [DataContract]
-    public class PhotoToSend
+    public class AudioToSend
     {
 
         /// <summary>
@@ -21,18 +21,34 @@ namespace TelegramBot
 
 
         /// <summary>
-        /// The photo to send. This must be an url of the photo
+        /// The audio to send in mp3 and max 50mb This must be an url of the audio file
         /// </summary>
-        [DataMember(Name="photo")]
-        public string Photo { get; set; }
+        [DataMember(Name="Audio")]
+        public string Audio { get; set; }
 
 
         /// <summary>
-        ///Photo caption (may also be used when resending photos by file_id), 0-200 characters
+        /// Audio caption, 0-200 characters, optional
         /// </summary>
         [DataMember(Name="caption")]
         public string Caption { get; set; }
 
+        /// <summary>
+        /// Duration of the audio in seconds, optional
+        /// </summary>
+        [DataMember(Name="duration")]
+        public int? Duration { get; set; }
+        /// <summary>
+        /// Performer of the audio. Is optional
+        /// </summary>
+        [DataMember(Name="performer")]
+        public string Performer { get; set; }
+
+        /// <summary>
+        /// Title of the track, optional
+        /// </summary>
+        [DataMember(Name="title")]
+        public string Title { get; set; }
 
         /// <summary>
         ///Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
