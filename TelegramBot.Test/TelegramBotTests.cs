@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using TelegramBot.RequestObjects;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -125,5 +127,76 @@ namespace TelegramBot.Test
             });
             Assert.True(result.Ok);
         }
+
+        [Fact]
+        public async Task SendPictureStreamed()
+        {
+            var stream = File.OpenRead("pomjong.jpg");
+            var userID = "264162278";
+            var bot = new TelegramBot(TelegramToken);
+            var result = await bot.SendPhotoAsync(new PhotoToSend()
+            {
+                ChatID = userID,
+                PhotoStream = stream,
+                PhotoName = "pomjong.jpg",
+                Caption = "Baby picture"
+            });
+            Assert.True(result.Ok);
+        }
+
+        [Fact]
+        public async Task SendAudio()
+        {
+            var stream = File.OpenRead("bleach.mp3");
+            var userID = "264162278";
+            var bot = new TelegramBot(TelegramToken);
+            var result = await bot.SendAudioAsync(new AudioToSend()
+            {
+                ChatID = userID,
+                AudioStream = stream,
+                AudioName = "bleach.mp3",
+                Title = "Puring of bleach Ucross Wyoming",
+                Performer = "Bleach as recorded by Christopher DeLaurenti",
+                Duration = 180,
+                Caption = "Puring of bleach Ucross Wyoming"
+            });
+            Assert.True(result.Ok);
+        }
+
+        [Fact]
+        public async Task SendAudioUrl()
+        {
+             
+            var userID = "264162278";
+            var bot = new TelegramBot(TelegramToken);
+            var result = await bot.SendAudioAsync(new AudioToSend()
+            {
+                ChatID = userID,
+                Audio = "http://ronsen.org/purrfectsounds/purrs/bleach.mp3",
+                Title = "Puring of bleach Ucross Wyoming",
+                Performer = "Bleach as recorded by Christopher DeLaurenti",
+                Duration = 180,
+                Caption = "Puring of bleach Ucross Wyoming"
+            });
+            Assert.True(result.Ok);
+        }
+
+        [Fact]
+        public async Task SendVoice()
+        {
+            var stream = File.OpenRead("catMauw.ogg");
+            var userID = "264162278";
+            var bot = new TelegramBot(TelegramToken);
+            var result = await bot.SendVoiceAsync(new VoiceToSend()
+            {
+                ChatID = userID,
+                VoiceStream = stream,
+                VoiceName = "catMauw.ogg", 
+                Duration = 130,
+                Caption = "Mauw do you speak it?"
+            });
+            Assert.True(result.Ok);
+        }
+
     }
 }

@@ -74,7 +74,7 @@ namespace TelegramBot
             ApiURL = $"{protoPart}://{options.Host}{portPart}/bot{Token}";
         }
 
-      
+
         /// <summary>
         /// The init which calls the getMe method of the Telegram api. When called multiple times and the first call was OK, the sequential calls don't call the API
         /// </summary>
@@ -97,12 +97,8 @@ namespace TelegramBot
         /// </summary>
         public async Task<MessageResponse> SendMessageAsync(MessageToSend message)
         {
-            await InitAsync();
-            var result = await DoRequest<MessageResponse>("sendMessage", new
-            {
-                Method = "JSON",
-                Payload = message
-            });
+            await InitAsync(); 
+            var result = await DoRequest<MessageResponse>("sendMessage", message);
 
             return result;
         }
@@ -112,11 +108,17 @@ namespace TelegramBot
         public async Task<MessageResponse> SendPhotoAsync(PhotoToSend photo)
         {
             await InitAsync();
-            var result = await DoRequest<MessageResponse>("sendPhoto", new 
+            MessageResponse result = null;
+            if (photo.PhotoStream != null)
             {
-                Method = "JSON",
-                Payload = photo
-            });
+                photo.Method = "POST";
+                result = await DoRequest<MessageResponse>("sendPhoto", photo);
+            }
+            else
+            {
+                photo.Method = "JSON";
+                result = await DoRequest<MessageResponse>("sendPhoto", photo );
+            }
 
             return result;
         }
@@ -126,11 +128,38 @@ namespace TelegramBot
         public async Task<MessageResponse> SendAudioAsync(AudioToSend audio)
         {
             await InitAsync();
-            var result = await DoRequest<MessageResponse>("sendAudio", new 
+            MessageResponse result = null;
+            if (audio.AudioStream != null)
             {
-                Method = "JSON",
-                Payload = audio
-            });
+                audio.Method = "POST";
+                result = await DoRequest<MessageResponse>("sendAudio", audio);
+            }
+            else
+            {
+                audio.Method = "JSON";
+                result = await DoRequest<MessageResponse>("sendAudio", audio);
+            }
+
+            return result;
+        }
+        /// <summary>
+        /// Use this method to send voice. On success, the sent Message is returned.
+        /// If you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Audio or Document). On success, the sent Message is returned. Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.
+        /// </summary>
+        public async Task<MessageResponse> SendVoiceAsync(VoiceToSend voice)
+        {
+            await InitAsync();
+            MessageResponse result = null;
+            if (voice.VoiceStream != null)
+            {
+                voice.Method = "POST";
+                result = await DoRequest<MessageResponse>("sendVoice", voice);
+            }
+            else
+            {
+                voice.Method = "JSON";
+                result = await DoRequest<MessageResponse>("sendVoice", voice);
+            }
 
             return result;
         }
@@ -140,7 +169,7 @@ namespace TelegramBot
         public async Task<MessageResponse> SendDocumentAsync(DocumentToSend document)
         {
             await InitAsync();
-            var result = await DoRequest<MessageResponse>("sendDocument", new 
+            var result = await DoRequest<MessageResponse>("sendDocument", new JsonToSend
             {
                 Method = "JSON",
                 Payload = document
@@ -164,20 +193,23 @@ namespace TelegramBot
         {
             if (string.IsNullOrEmpty(url) || !url.ToLower().StartsWith("https:")) throw new ArgumentException("The url should start with https");
             await InitAsync();
-            var result = await DoRequest<WebHookResponse>("setWebhook", new
+            var result = await DoRequest<WebHookResponse>("setWebhook", new BasicToSend
             {
                 Method = "POST",
                 URL = url
             });
             return result.Ok;
         }
+
+     
+
         /// <summary>
         /// Removes the webhook, which basicly calls setWebhook with empty url parameter
         /// </summary>
         public async Task<bool> RemoveWebHookAsync()
         {
             await InitAsync();
-            var result = await DoRequest<WebHookResponse>("setWebhook", new
+            var result = await DoRequest<WebHookResponse>("setWebhook", new BasicToSend
             {
                 Method = "POST",
                 URL = ""
@@ -191,7 +223,7 @@ namespace TelegramBot
         public async Task<WebHookInfoResponse> GetWebhookInfoAsync()
         {
             await InitAsync();
-            var result = await DoRequest<WebHookInfoResponse>("getWebhookInfo", new { Method="GET"});
+            var result = await DoRequest<WebHookInfoResponse>("getWebhookInfo", new BasicToSend { Method = "GET" });
             return result;
         }
 
@@ -201,7 +233,7 @@ namespace TelegramBot
         private async Task LongPoll(UpdateReceived onUpdateReceived, CancellationToken cancelToken)
         {
 
-            var getUpdateTask = Task.Run(()=> DoRequest<UpdateResponse>("getUpdates", new
+            var getUpdateTask = Task.Run(() => DoRequest<UpdateResponse>("getUpdates", new BasicToSend
             {
                 Method = "POST",
                 Limit = UpdatesLimit,
@@ -223,65 +255,114 @@ namespace TelegramBot
                 }
 
             }
-           
+
             await LongPoll(onUpdateReceived, cancelToken);
         }
 
         /// <summary>
         /// Internal method to make the GET/POST request to the Telegram API
         /// </summary>
-        private async Task<T> DoRequest<T>(string action, dynamic options) where T : new()
+        private async Task<T> DoRequest<T>(string action, IToSend options) where T : new()
         {
 
             using (var client = new HttpClient())
             {
-                 
-                    var uri = new System.Uri($"{ApiURL}/{action}");
-                    var request = new HttpRequestMessage(HttpMethod.Get, uri); 
 
-                    if (options != null && options.Method == "POST")
+                var uri = new System.Uri($"{ApiURL}/{action}");
+                var request = new HttpRequestMessage(HttpMethod.Get, uri);
+
+                if (options != null && options.Method == "POST")
+                {
+                    request.Headers.Add("ContentType", "application/x-www-form-urlencoded");
+                    request.Method = HttpMethod.Post;
+                    var values = new MultipartFormDataContent();
+                    if (!String.IsNullOrEmpty(options.URL)) values.Add(new StringContent(options.URL), "url");
+                    if (options.Limit.HasValue) values.Add(new StringContent(options.Limit.ToString(), Encoding.UTF8), "limit");
+                    if (options.Timeout.HasValue) values.Add(new StringContent(options.Timeout.ToString(), Encoding.UTF8), "timeout");
+                    if (options.Offset.HasValue) values.Add(new StringContent(options.Offset.ToString(), Encoding.UTF8), "offset");
+
+                    if (options is PhotoToSend)
                     {
-                        request.Headers.Add("ContentType", "application/x-www-form-urlencoded");
-                        request.Method = HttpMethod.Post;
-                        var values = new List<KeyValuePair<string, string>>();
-                        if (IsPropertyExist(options, "URL")) values.Add(new KeyValuePair<string, string>("url", options.URL));
-                        if (IsPropertyExist(options, "Limit")) values.Add(new KeyValuePair<string, string>("limit", options.Limit.ToString()));
-                        if (IsPropertyExist(options, "Timeout")) values.Add(new KeyValuePair<string, string>("timeout", options.Timeout.ToString()));
-                        if (IsPropertyExist(options, "Offset") && options.Offset != null) values.Add(new KeyValuePair<string, string>("offset", options.Offset.ToString()));
-                        if (action == "getUpdates")
-                        {
-                            client.Timeout = TimeSpan.FromSeconds(NetConnectionTimeout + options.Limit + 2);
-                        }
+                        var photoToSend = (PhotoToSend)options;
+                        if (!String.IsNullOrEmpty(photoToSend.Caption)) values.Add(new StringContent(photoToSend.Caption), "caption");
+                        if (!String.IsNullOrEmpty(photoToSend.ChatID)) values.Add(new StringContent(photoToSend.ChatID), "chat_id");
+                        values.Add(new StringContent(photoToSend.DisableNotification ? "true" : "false"), "disable_notification");
 
-                        request.Content = new FormUrlEncodedContent(values);
-
+                        if (photoToSend.ReplyMarkup !=null) values.Add(new StringContent(JsonConvert.SerializeObject(photoToSend.ReplyMarkup)), "reply_markup");
+                        if (photoToSend.ReplyToMessageID.HasValue) values.Add(new StringContent(photoToSend.ReplyToMessageID.Value.ToString()), "reply_to_message_id");
+                        if (photoToSend.PhotoStream != null) values.Add(new StreamContent((Stream)photoToSend.PhotoStream), "photo", photoToSend.PhotoName);
                     }
-                    if (options != null && options.Method == "JSON")
+                    if (options is AudioToSend)
                     {
+                        var audioToSend = (AudioToSend)options;
+                        if (!String.IsNullOrEmpty(audioToSend.ChatID)) values.Add(new StringContent(audioToSend.ChatID), "chat_id");
+                        if (!String.IsNullOrEmpty(audioToSend.Caption)) values.Add(new StringContent(audioToSend.Caption), "caption");
+                        if ( audioToSend.Duration.HasValue) values.Add(new StringContent(audioToSend.Duration.ToString(), Encoding.UTF8), "duration");
+                        if (!String.IsNullOrEmpty(audioToSend.Performer)) values.Add(new StringContent(audioToSend.Performer), "performer");
+                        if (!String.IsNullOrEmpty(audioToSend.Title)) values.Add(new StringContent(audioToSend.Title), "title");
+                        values.Add(new StringContent(audioToSend.DisableNotification ? "true" : "false"), "disable_notification");
 
-                     
-                        request.Method = HttpMethod.Post;
-                        if (IsPropertyExist(options, "Payload"))
-                        {
-                            string serialized = await JsonConvert.SerializeObjectAsync(options.Payload, Formatting.None, new JsonSerializerSettings()
-                            {
-                                NullValueHandling = NullValueHandling.Ignore
-                            });
-                            request.Content = new StringContent(serialized, Encoding.UTF8, "application/json"); 
-                        }
+                        if (audioToSend.ReplyMarkup != null) values.Add(new StringContent(JsonConvert.SerializeObject(audioToSend.ReplyMarkup)), "reply_markup");
+                        if (audioToSend.ReplyToMessageID.HasValue) values.Add(new StringContent(audioToSend.ReplyToMessageID.Value.ToString()), "reply_to_message_id");
+                        if (audioToSend.AudioStream != null) values.Add(new StreamContent((Stream)audioToSend.AudioStream), "audio", audioToSend.AudioName);
                     }
 
-                    var response = await client.SendAsync(request);
-
-                    var result = await response.Content.ReadAsStringAsync();
-                    T returnObject = default(T);
-                    await Task.Factory.StartNew(() =>
+                    if (options is VoiceToSend)
                     {
-                        returnObject = JsonConvert.DeserializeObject<T>(result);
-                    });
-
-                    return returnObject;
+                        var voiceToSend = (VoiceToSend)options;
+                        if (!String.IsNullOrEmpty(voiceToSend.ChatID)) values.Add(new StringContent(voiceToSend.ChatID), "chat_id");
+                        if (!String.IsNullOrEmpty(voiceToSend.Caption)) values.Add(new StringContent(voiceToSend.Caption), "caption");
+                        if (voiceToSend.Duration.HasValue) values.Add(new StringContent(voiceToSend.Duration.ToString(), Encoding.UTF8), "duration");
                 
+ 
+                        values.Add(new StringContent(voiceToSend.DisableNotification ? "true" : "false"), "disable_notification");
+
+                        if (voiceToSend.ReplyMarkup != null) values.Add(new StringContent(JsonConvert.SerializeObject(voiceToSend.ReplyMarkup)), "reply_markup");
+                        if (voiceToSend.ReplyToMessageID.HasValue) values.Add(new StringContent(voiceToSend.ReplyToMessageID.Value.ToString()), "reply_to_message_id");
+                        if (voiceToSend.VoiceStream != null) values.Add(new StreamContent((Stream)voiceToSend.VoiceStream), "voice", voiceToSend.VoiceName);
+                    }
+                    if (action == "getUpdates")
+                    {
+                        client.Timeout = TimeSpan.FromSeconds(NetConnectionTimeout + options.Limit.Value + 2);
+                    }
+
+                    request.Content = values;
+                   
+                }
+                if (options != null && options.Method == "JSON")
+                {
+
+
+                    request.Method = HttpMethod.Post;
+                    if (options is JsonToSend)
+                    {
+                        string serialized =   JsonConvert.SerializeObject(((JsonToSend)options).Payload, Formatting.None, new JsonSerializerSettings()
+                        {
+                            NullValueHandling = NullValueHandling.Ignore
+                        });
+                        request.Content = new StringContent(serialized, Encoding.UTF8, "application/json");
+                    }
+                    else
+                    {
+                        string serialized = JsonConvert.SerializeObject(options, Formatting.None, new JsonSerializerSettings()
+                        {
+                            NullValueHandling = NullValueHandling.Ignore
+                        });
+                        request.Content = new StringContent(serialized, Encoding.UTF8, "application/json");
+                    }
+                }
+
+                var response = await client.SendAsync(request).ConfigureAwait(false);
+
+                var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                T returnObject = default(T);
+                await Task.Factory.StartNew(() =>
+                {
+                    returnObject = JsonConvert.DeserializeObject<T>(result);
+                }).ConfigureAwait(false);
+
+                return returnObject;
+
             }
 
         }

@@ -1,4 +1,5 @@
- using System.Runtime.Serialization;
+using System.IO;
+using System.Runtime.Serialization;
 
 
 namespace TelegramBot.RequestObjects
@@ -10,7 +11,7 @@ namespace TelegramBot.RequestObjects
     /// For now only url's of the audio can be send
     /// </summary>
     [DataContract]
-    public class AudioToSend
+    public class AudioToSend: IToSend
     {
 
         /// <summary>
@@ -23,7 +24,7 @@ namespace TelegramBot.RequestObjects
         /// <summary>
         /// The audio to send in mp3 and max 50mb This must be an url of the audio file
         /// </summary>
-        [DataMember(Name="Audio")]
+        [DataMember(Name="audio")]
         public string Audio { get; set; }
 
 
@@ -61,12 +62,32 @@ namespace TelegramBot.RequestObjects
         ///If the message is a reply, ID of the original message
         /// </summary>
         [DataMember(Name="reply_to_message_id")]
-        public int ReplyToMessageID { get; set; }
+        public int? ReplyToMessageID { get; set; }
 
         /// <summary>
         ///Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to hide reply keyboard or to force a reply from the user.
         /// </summary>
         [DataMember(Name="reply_markup")]
         public IReplyMarkup  ReplyMarkup { get; set; }
+ 
+        /// <summary>
+        /// This allows you to send a audio as a stream instead of a url
+        /// </summary>
+        [IgnoreDataMember()]
+        public Stream AudioStream { get; set; }
+        /// <summary>
+        /// This allows you to send the file name of the stream
+        /// </summary>
+        [IgnoreDataMember()]
+        public string AudioName { get; set; }
+
+        public string Method { get; set; }
+
+        public string URL { get; set; }
+
+        public int? Limit { get; set; }
+        public int? Offset { get; set; }
+
+        public int? Timeout { get; set; }
     }
 }

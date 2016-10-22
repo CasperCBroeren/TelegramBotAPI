@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace TelegramBot.RequestObjects
 {
     [DataContract]
-    public class MessageToSend
+    public class MessageToSend: IToSend
     {
         /// <summary>
         /// Unique identifier for the target chat or username of the target channel (in the format @channelusername)
@@ -49,6 +49,16 @@ namespace TelegramBot.RequestObjects
         /// </summary>
         [DataMember(Name = "reply_markup")]
         public IReplyMarkup ReplyMarkup { get; set; }
+
+        public string Method { get { return "JSON"; } set { } }
+
+        public string URL { get; set; }
+
+        public int? Limit { get; set; }
+        public int? Offset { get; set; }
+
+        public int? Timeout { get; set; }
+         
     }
 
     /// <summary>
@@ -135,5 +145,7 @@ namespace TelegramBot.RequestObjects
         /// </summary>
         [DataMember(Name = "selective")]
         public bool Selective { get; set; }
+
+      
     }
 }

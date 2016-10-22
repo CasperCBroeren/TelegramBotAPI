@@ -1,4 +1,5 @@
- using System.Runtime.Serialization;
+using System.IO;
+using System.Runtime.Serialization;
 
 
 namespace TelegramBot.RequestObjects
@@ -10,7 +11,7 @@ namespace TelegramBot.RequestObjects
     /// For now only url's of the Document can be send
     /// </summary>
     [DataContract]
-    public class DocumentToSend
+    public class DocumentToSend: IToSend
     {
 
         /// <summary>
@@ -51,5 +52,25 @@ namespace TelegramBot.RequestObjects
         /// </summary>
         [DataMember(Name="reply_markup")]
         public IReplyMarkup  ReplyMarkup { get; set; }
+
+        /// <summary>
+        /// This allows you to send a Photo as a stream instead of a url
+        /// </summary>
+        [IgnoreDataMember()]
+        public Stream DocumentStream { get; set; }
+        /// <summary>
+        /// This allows you to send the file name of the stream
+        /// </summary>
+        [IgnoreDataMember()]
+        public string DocumentName { get; set; }
+
+        public string Method { get; set; }
+
+        public string URL { get; set; }
+
+        public int? Limit { get; set; }
+        public int? Offset { get; set; }
+
+        public int? Timeout { get; set; }
     }
 }
