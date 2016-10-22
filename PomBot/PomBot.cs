@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,51 +24,66 @@ namespace PomBot
 
         public void MessageReceived(Update u)
         {
-            var random = new Random(System.Environment.TickCount);
-            var pos = random.Next(0, 6);
             Task result = null;
-            if (pos == 0)
+            if (u.Message.Text.ToLower().Contains("whats up") || u.Message.Text.ToLower().Contains("doing?") || u.Message.Text.ToLower().Contains("sup?"))
             {
-                result = this.SendMessageAsync(new MessageToSend()
+
+                var stream = File.OpenRead("chillinabox.jpg"); 
+                result = SendPhotoAsync(new PhotoToSend()
                 {
                     ChatID = u.Message.From.ID.ToString(),
-                    Text = "Mauuuuw....<b>MAH</b>",
-                    ParseMode = "HTML"
+                    PhotoStream = stream,
+                    PhotoName = "chillinabox.jpg",
+                    Caption = "Not much chilling in a box"
                 });
             }
-            if (pos == 1)
+            else
             {
-                result = this.SendMessageAsync(new MessageToSend()
+                var random = new Random(System.Environment.TickCount);
+                var pos = random.Next(0, 10);
+
+                if (pos == 0)
                 {
-                    ChatID = u.Message.From.ID.ToString(),
-                    Text = "ETEN!",
-                    ParseMode = "HTML"
-                });
-            }
-            if (pos == 2)
-            {
-                result = this.SendMessageAsync(new MessageToSend()
+                    result = this.SendMessageAsync(new MessageToSend()
+                    {
+                        ChatID = u.Message.From.ID.ToString(),
+                        Text = "Mauuuuw....<b>MAH</b>",
+                        ParseMode = "HTML"
+                    });
+                }
+                if (pos == 1)
                 {
-                    ChatID = u.Message.From.ID.ToString(),
-                    Text = "prrrrrrrrr..." + u.Message.From.FirstName,
-                    ParseMode = "HTML"
-                });
-            }
-            if (pos == 3)
-            {
-                result = this.SendMessageAsync(new MessageToSend()
+                    result = this.SendMessageAsync(new MessageToSend()
+                    {
+                        ChatID = u.Message.From.ID.ToString(),
+                        Text = "Food!",
+                        ParseMode = "HTML"
+                    });
+                }
+                if (pos == 2)
                 {
-                    ChatID = u.Message.From.ID.ToString(),
-                    Text = "MAUW mauw mauw mauw mauw",
-                    ParseMode = "HTML"
-                });
-            }
-            if (pos == 4)
-            {
-                result = this.SendMessageAsync(new MessageToSend()
+                    result = this.SendMessageAsync(new MessageToSend()
+                    {
+                        ChatID = u.Message.From.ID.ToString(),
+                        Text = "prrrrrrrrr..." + u.Message.From.FirstName,
+                        ParseMode = "HTML"
+                    });
+                }
+                if (pos == 3)
                 {
-                    ChatID = u.Message.From.ID.ToString(),
-                    Text = @" 
+                    result = this.SendMessageAsync(new MessageToSend()
+                    {
+                        ChatID = u.Message.From.ID.ToString(),
+                        Text = "MAUW mauw mauw mauw mauw",
+                        ParseMode = "HTML"
+                    });
+                }
+                if (pos == 4)
+                {
+                    result = this.SendMessageAsync(new MessageToSend()
+                    {
+                        ChatID = u.Message.From.ID.ToString(),
+                        Text = @" 
               a          a
              aaa        aaa
             aaaaaaaaaaaaaaaa
@@ -88,21 +104,74 @@ namespace PomBot
    aaa    aaaaaaaaaaaaaaaaaaaa
     aaaaaaaaaaaaaaaaaaaaaaaaaa
      aaaaaaaaaaaaaaaaaaaaaaaaa",
-                    ParseMode = "HTML"
-                });
-            }
-            if (pos == 5)
-            {
-
-                string img = "https://blackcatsrule.files.wordpress.com/2014/10/cute-black-cat-detts6f6.jpg";
-                
-                result = this.SendPhotoAsync(new PhotoToSend()
+                        ParseMode = "HTML"
+                    });
+                }
+                if (pos == 5)
                 {
-                    ChatID = u.Message.From.ID.ToString(),
-                    Photo = img,
-                    Caption = "Fake"
-                });
-            }
+
+                    var stream = File.OpenRead("pomjong.jpg"); 
+                    result = SendPhotoAsync(new PhotoToSend()
+                    {
+                        ChatID = u.Message.From.ID.ToString(),
+                        PhotoStream = stream,
+                        PhotoName = "pomjong.jpg",
+                        Caption = "Baby picture"
+                    });
+                }
+                
+                if (pos == 6)
+                {
+
+                    var stream = File.OpenRead("backofmybox.jpg"); 
+                    result = SendPhotoAsync(new PhotoToSend()
+                    {
+                        ChatID = u.Message.From.ID.ToString(),
+                        PhotoStream = stream,
+                        PhotoName = "backofmybox.jpg",
+                        Caption = "BACK OF! THIS IS MY BOX.. I will use laser eyes"
+                    });
+                }
+
+                if (pos == 7)
+                {
+
+                    var stream = File.OpenRead("kingofthefridge.jpg"); 
+                    result = SendPhotoAsync(new PhotoToSend()
+                    {
+                        ChatID = u.Message.From.ID.ToString(),
+                        PhotoStream = stream,
+                        PhotoName = "kingofthefridge.jpg",
+                        Caption = "Whoe ha! king of the fridge"
+                    });
+                }
+
+                if (pos == 8)
+                {
+
+                    var stream = File.OpenRead("mauw.ogg"); 
+                    result = SendVoiceAsync(new VoiceToSend()
+                    {
+                        ChatID = u.Message.From.ID.ToString(),
+                        VoiceStream = stream,
+                        VoiceName = "mauw.ogg",
+                        Caption = "What does this button do?"
+                    });
+                }
+
+                if (pos == 9)
+                {
+
+                    var stream = File.OpenRead("printerinspection.jpg");
+                    result = SendPhotoAsync(new PhotoToSend()
+                    {
+                        ChatID = u.Message.From.ID.ToString(),
+                        PhotoStream = stream,
+                        PhotoName = "printerinspection.jpg",
+                        Caption = "Is this my document printing?"
+                    });
+                }
+            }            
             result.Wait();
         }
     }

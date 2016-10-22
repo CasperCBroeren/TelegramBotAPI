@@ -169,11 +169,38 @@ namespace TelegramBot
         public async Task<MessageResponse> SendDocumentAsync(DocumentToSend document)
         {
             await InitAsync();
-            var result = await DoRequest<MessageResponse>("sendDocument", new JsonToSend
+            MessageResponse result = null;
+            if (document.DocumentStream != null)
             {
-                Method = "JSON",
-                Payload = document
-            });
+                document.Method = "POST";
+                result = await DoRequest<MessageResponse>("sendDocument", document);
+            }
+            else
+            {
+                document.Method = "JSON";
+                result = await DoRequest<MessageResponse>("sendDocument", document);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Use this method to send a document. On success, the sent Message is returned.
+        /// </summary>
+        public async Task<MessageResponse> SendStickerAsync(StickerToSend sticker)
+        {
+            await InitAsync();
+            MessageResponse result = null;
+            if (sticker.StickerStream != null)
+            {
+                sticker.Method = "POST";
+                result = await DoRequest<MessageResponse>("sendSticker", sticker);
+            }
+            else
+            {
+                sticker.Method = "JSON";
+                result = await DoRequest<MessageResponse>("sendSticker", sticker);
+            }
 
             return result;
         }
@@ -292,6 +319,17 @@ namespace TelegramBot
                         if (photoToSend.ReplyToMessageID.HasValue) values.Add(new StringContent(photoToSend.ReplyToMessageID.Value.ToString()), "reply_to_message_id");
                         if (photoToSend.PhotoStream != null) values.Add(new StreamContent((Stream)photoToSend.PhotoStream), "photo", photoToSend.PhotoName);
                     }
+                    if (options is DocumentToSend)
+                    {
+                        var DocumentToSend = (DocumentToSend)options;
+                        if (!String.IsNullOrEmpty(DocumentToSend.Caption)) values.Add(new StringContent(DocumentToSend.Caption), "caption");
+                        if (!String.IsNullOrEmpty(DocumentToSend.ChatID)) values.Add(new StringContent(DocumentToSend.ChatID), "chat_id");
+                        values.Add(new StringContent(DocumentToSend.DisableNotification ? "true" : "false"), "disable_notification");
+
+                        if (DocumentToSend.ReplyMarkup != null) values.Add(new StringContent(JsonConvert.SerializeObject(DocumentToSend.ReplyMarkup)), "reply_markup");
+                        if (DocumentToSend.ReplyToMessageID.HasValue) values.Add(new StringContent(DocumentToSend.ReplyToMessageID.Value.ToString()), "reply_to_message_id");
+                        if (DocumentToSend.DocumentStream != null) values.Add(new StreamContent((Stream)DocumentToSend.DocumentStream), "document", DocumentToSend.DocumentName);
+                    }
                     if (options is AudioToSend)
                     {
                         var audioToSend = (AudioToSend)options;
@@ -306,7 +344,16 @@ namespace TelegramBot
                         if (audioToSend.ReplyToMessageID.HasValue) values.Add(new StringContent(audioToSend.ReplyToMessageID.Value.ToString()), "reply_to_message_id");
                         if (audioToSend.AudioStream != null) values.Add(new StreamContent((Stream)audioToSend.AudioStream), "audio", audioToSend.AudioName);
                     }
+                    if (options is StickerToSend)
+                    {
+                        var audioToSend = (StickerToSend)options;
+                        if (!String.IsNullOrEmpty(audioToSend.ChatID)) values.Add(new StringContent(audioToSend.ChatID), "chat_id");                        
+                        values.Add(new StringContent(audioToSend.DisableNotification ? "true" : "false"), "disable_notification");
 
+                        if (audioToSend.ReplyMarkup != null) values.Add(new StringContent(JsonConvert.SerializeObject(audioToSend.ReplyMarkup)), "reply_markup");
+                        if (audioToSend.ReplyToMessageID.HasValue) values.Add(new StringContent(audioToSend.ReplyToMessageID.Value.ToString()), "reply_to_message_id");
+                        if (audioToSend.StickerStream != null) values.Add(new StreamContent((Stream)audioToSend.StickerStream), "audio", "sticker");
+                    }
                     if (options is VoiceToSend)
                     {
                         var voiceToSend = (VoiceToSend)options;

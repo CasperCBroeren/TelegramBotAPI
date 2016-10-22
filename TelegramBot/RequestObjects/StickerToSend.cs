@@ -7,11 +7,10 @@ namespace TelegramBot.RequestObjects
 
 
     /// <summary>
-    /// The Document and caption to send.
-    /// For now only url's of the Document can be send
+    /// The Sticker  to send. 
     /// </summary>
     [DataContract]
-    public class DocumentToSend: IToSend
+    public class StickerToSend: IToSend
     {
 
         /// <summary>
@@ -22,17 +21,11 @@ namespace TelegramBot.RequestObjects
 
 
         /// <summary>
-        /// The Document to send  max 50mb This must be an url of the Document file
+        /// The url to  .webp stickers
         /// </summary>
-        [DataMember(Name="Document")]
-        public string Document { get; set; }
+        [DataMember(Name= "sticker")]
+        public string Sticker { get; set; }
 
-
-        /// <summary>
-        /// Document caption, 0-200 characters, optional
-        /// </summary>
-        [DataMember(Name="caption")]
-        public string Caption { get; set; }
 
          /// <summary>
         ///Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
@@ -54,15 +47,11 @@ namespace TelegramBot.RequestObjects
         public IReplyMarkup  ReplyMarkup { get; set; }
 
         /// <summary>
-        /// This allows you to send a Photo as a stream instead of a url
+        /// This allows you to send a sticker as a stream instead of a url
         /// </summary>
         [IgnoreDataMember()]
-        public Stream DocumentStream { get; set; }
-        /// <summary>
-        /// This allows you to send the file name of the stream
-        /// </summary>
-        [IgnoreDataMember()]
-        public string DocumentName { get; set; }
+        public Stream StickerStream { get; set; }
+   
 
         public string Method { get; set; }
 
