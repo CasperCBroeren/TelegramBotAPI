@@ -18,5 +18,9 @@
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
+  <ItemGroup>
+    <DnxInvisibleContent Include="bleach.mp3" />
+    <DnxInvisibleContent Include="pomjong.jpg" />
+  </ItemGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.targets" Condition="'$(VSToolsPath)' != ''" />
 </Project>

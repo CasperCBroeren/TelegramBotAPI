@@ -407,7 +407,7 @@ namespace TelegramBot
                 {
                     returnObject = JsonConvert.DeserializeObject<T>(result);
                 }).ConfigureAwait(false);
-
+                
                 return returnObject;
 
             }
