@@ -11,7 +11,7 @@ namespace TelegramBot.Test
     public class Base
     {
         CancellationTokenSource source = new CancellationTokenSource();
-        private const string TelegramToken = "x";
+        private const string TelegramToken = "280025842:AAEHYw3viM7TD4km44OaM7rjyoXWAU4mp5c";
         private readonly ITestOutputHelper output;
 
         public Base(ITestOutputHelper output)

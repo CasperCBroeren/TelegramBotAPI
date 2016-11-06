@@ -1,0 +1,8 @@
+﻿{
+  "bindings": [
+    {
+      "name": "scheduleTest",
+      "type": "schedule" 
+    }
+  ]
+}
