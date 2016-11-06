@@ -1,6 +1,6 @@
 using System.Net;
 using System.Threading.Tasks;
-
+using PomBot;
 
 private const string TelegramToken = "280025842:AAEHYw3viM7TD4km44OaM7rjyoXWAU4mp5c";
 public static void Run(TimerInfo myTimer, TraceWriter log)
