@@ -17,7 +17,7 @@ private static void ServeBot(TraceWriter log)
 {
     try
     {
-        PomBot p = new PomBot(TelegramToken);
+        PomBot.PomBot p = new PomBot.PomBot(TelegramToken);
         var task = p.Start();
         task.Wait();
 
