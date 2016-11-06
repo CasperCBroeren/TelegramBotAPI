@@ -1,3 +1,4 @@
+#load "PomBot.cs"
 using System.Net;
 using System.Threading.Tasks;
 using PomBot;
