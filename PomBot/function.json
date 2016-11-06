@@ -2,7 +2,7 @@
   "bindings": [
     {
       "schedule": "0 */1 * * * *",
-      "name": "scheduleTest",
+      "name": "Run",
       "type": "timerTrigger",
       "direction": "in"
     }
