@@ -1,3 +1,6 @@
+#load "Brain/Lexings.cs"
+#load "Brain/Meme.cs"
+#load "Brain/Memory.cs"
 #load "PomBot.cs"
 using System.Net;
 using System.Threading.Tasks;
