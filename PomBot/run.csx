@@ -6,7 +6,7 @@ private const string TelegramToken = "280025842:AAEHYw3viM7TD4km44OaM7rjyoXWAU4m
 public static void Run(TimerInfo myTimer, TraceWriter log)
 {
     log.Info("Bot started");
-    ServeBot();
+    //ServeBot();
 }
 
 private static void ServeBot(TraceWriter log)
