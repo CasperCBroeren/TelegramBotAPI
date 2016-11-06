@@ -1,9 +1,9 @@
 ﻿{
   "bindings": [
     {
-      "schedule": "0 */5 * * * *",
+      "schedule": "0 */1 * * * *",
       "name": "scheduleTest",
-      "type": "timerTrigger",
+      "type": "tableTrigger",
       "direction": "in"
     }
   ]
