@@ -3,12 +3,13 @@ using System.Threading.Tasks;
 
 
 private const string TelegramToken = "280025842:AAEHYw3viM7TD4km44OaM7rjyoXWAU4mp5c";
-public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log)
+public static async Task<HttpResponseMessage> Run(TimerInfo myTimer, TraceWriter log)
 {
+    log.Info("Bot started");
     await ServeBot();
 }
 
-private static async Task ServeBot()
+private static async Task ServeBot(TraceWriter log)
 {
     try
     {
@@ -18,7 +19,7 @@ private static async Task ServeBot()
     }
     catch (Exception ex)
     {
-        Console.WriteLine("Bot restart because " + ex.Message);
+        log.Info("Bot restart because " + ex.Message);
         await ServeBot(); // I know this is infinite loopish
 
     }
